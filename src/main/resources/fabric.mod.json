@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "id": "guiscalesplitter",
+  "version": "${version}",
+  "name": "GUI Scale Splitter",
+  "description": "",
+  "authors": [ "RedLime" ],
+  "contact": {
+    "repo": "https://github.com/RedLime/GUIScaleSplitter"
+  },
+  "license": "GPL-3.0",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "com.redlimerl.guiscalesplitter.GuiScaleSplitter"
+    ],
+    "modmenu": [ "com.redlimerl.guiscalesplitter.GuiScaleSplitter" ]
+  },
+  "mixins": [
+    "guiscalesplitter.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.15-",
+    "minecraft": "${minecraft_version}",
+    "modmenu": ">=9.0"
+  },
+  "accessWidener": "guiscalesplitter.accesswidener"
+}
