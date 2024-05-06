@@ -33,17 +33,17 @@ public class MixinInGameHud {
         return this.client.currentScreen instanceof GuiScaleScreen;
     }
 
-    @WrapOperation(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/option/KeyBinding;isPressed()Z"))
+    @WrapOperation(method = "renderPlayerList", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/option/KeyBinding;isPressed()Z"))
     public boolean keyPressed(KeyBinding instance, Operation<Boolean> original) {
         return original.call(instance) || this.isConfigScreen();
     }
 
-    @WrapOperation(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/MinecraftClient;isInSingleplayer()Z"))
+    @WrapOperation(method = "renderPlayerList", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/MinecraftClient;isInSingleplayer()Z"))
     public boolean modifySingleplay(MinecraftClient instance, Operation<Boolean> original) {
         return original.call(instance) && !FabricLoader.getInstance().isDevelopmentEnvironment();
     }
 
-    @WrapOperation(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/PlayerListHud;render(Lnet/minecraft/client/gui/DrawContext;ILnet/minecraft/scoreboard/Scoreboard;Lnet/minecraft/scoreboard/ScoreboardObjective;)V"))
+    @WrapOperation(method = "renderPlayerList", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/PlayerListHud;render(Lnet/minecraft/client/gui/DrawContext;ILnet/minecraft/scoreboard/Scoreboard;Lnet/minecraft/scoreboard/ScoreboardObjective;)V"))
     public void onPlayerListRender(PlayerListHud instance, DrawContext context, int scaledWindowWidth, Scoreboard scoreboard, ScoreboardObjective objective, Operation<Void> original) {
         float listScale = GuiScaleSplitter.getOption("playerListScale");
         context.getMatrices().push();
@@ -52,14 +52,14 @@ public class MixinInGameHud {
         context.getMatrices().pop();
     }
 
-    @WrapOperation(method = "method_55440", at = @At(value = "FIELD", target = "Lnet/minecraft/client/gui/hud/InGameHud;scaledHeight:I"))
-    public int onStartScoreboardRenderHeight(InGameHud instance, Operation<Integer> original) {
+    @WrapOperation(method = "method_55440", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;getScaledWindowHeight()I"))
+    public int onStartScoreboardRenderHeight(DrawContext instance, Operation<Integer> original) {
         float listScale = GuiScaleSplitter.getOption("scoreboardScale");
         return (int) (original.call(instance) / listScale);
     }
 
-    @WrapOperation(method = "method_55440", at = @At(value = "FIELD", target = "Lnet/minecraft/client/gui/hud/InGameHud;scaledWidth:I"))
-    public int onStartScoreboardRenderWidth(InGameHud instance, Operation<Integer> original) {
+    @WrapOperation(method = "method_55440", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;getScaledWindowWidth()I"))
+    public int onStartScoreboardRenderWidth(DrawContext instance, Operation<Integer> original) {
         float listScale = GuiScaleSplitter.getOption("scoreboardScale");
         return (int) (original.call(instance) / listScale);
     }
@@ -83,29 +83,29 @@ public class MixinInGameHud {
         lastDrawContext = null;
     }
 
-    @WrapOperation(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/util/math/MatrixStack;translate(FFF)V", ordinal = 1))
+    @WrapOperation(method = "renderTitleAndSubtitle", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/util/math/MatrixStack;translate(FFF)V"))
     public void onTranslateRender(MatrixStack instance, float x, float y, float z, Operation<Void> original) {
         float listScale = GuiScaleSplitter.getOption("titleScale");
         instance.scale(listScale, listScale, 1);
         instance.translate(x / listScale, y / listScale, z);
     }
 
-    @WrapOperation(method = "render", at = @At(value = "FIELD", target = "Lnet/minecraft/client/gui/hud/InGameHud;title:Lnet/minecraft/text/Text;"))
+    @WrapOperation(method = "renderTitleAndSubtitle", at = @At(value = "FIELD", target = "Lnet/minecraft/client/gui/hud/InGameHud;title:Lnet/minecraft/text/Text;"))
     public Text onTitleModify(InGameHud instance, Operation<Text> original) {
         return this.isConfigScreen() ? GuiScaleScreen.EXAMPLE_TITLE : original.call(instance);
     }
 
-    @WrapOperation(method = "render", at = @At(value = "FIELD", target = "Lnet/minecraft/client/gui/hud/InGameHud;titleRemainTicks:I"))
+    @WrapOperation(method = "renderTitleAndSubtitle", at = @At(value = "FIELD", target = "Lnet/minecraft/client/gui/hud/InGameHud;titleRemainTicks:I"))
     public int onTitleTimeModify(InGameHud instance, Operation<Integer> original) {
         return this.isConfigScreen() ? 100 : original.call(instance);
     }
 
-    @WrapOperation(method = "render", at = @At(value = "FIELD", target = "Lnet/minecraft/client/gui/hud/InGameHud;titleStayTicks:I"))
+    @WrapOperation(method = "renderTitleAndSubtitle", at = @At(value = "FIELD", target = "Lnet/minecraft/client/gui/hud/InGameHud;titleStayTicks:I"))
     public int onTitleStayTimeModify(InGameHud instance, Operation<Integer> original) {
         return this.isConfigScreen() ? 200 : original.call(instance);
     }
 
-    @WrapOperation(method = "render", at = @At(value = "FIELD", target = "Lnet/minecraft/client/gui/hud/InGameHud;subtitle:Lnet/minecraft/text/Text;"))
+    @WrapOperation(method = "renderTitleAndSubtitle", at = @At(value = "FIELD", target = "Lnet/minecraft/client/gui/hud/InGameHud;subtitle:Lnet/minecraft/text/Text;"))
     public Text onSubtitleModify(InGameHud instance, Operation<Text> original) {
         return this.isConfigScreen() ? GuiScaleScreen.EXAMPLE_SUBTITLE : original.call(instance);
     }

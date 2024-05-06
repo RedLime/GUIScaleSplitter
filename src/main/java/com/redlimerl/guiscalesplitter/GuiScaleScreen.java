@@ -220,8 +220,6 @@ public class GuiScaleScreen extends Screen {
             context.getMatrices().pop();
 
             context.getMatrices().push();
-            ((InGameHudAccessor) this.client.inGameHud).setScaledWidth(context.getScaledWindowWidth());
-            ((InGameHudAccessor) this.client.inGameHud).setScaledHeight(context.getScaledWindowHeight());
             Scoreboard scoreboard = new Scoreboard();
             ScoreboardObjective objective = scoreboard.addObjective("test", ScoreboardCriterion.DUMMY, Text.literal("Test Scoreboard"), ScoreboardCriterion.RenderType.INTEGER, false, null);
             ScoreAccess score = scoreboard.getOrCreateScore(ScoreHolder.fromName("test1"), objective);
@@ -233,10 +231,10 @@ public class GuiScaleScreen extends Screen {
             context.getMatrices().push();
             float playerListScale = GuiScaleSplitter.getOption("playerListScale");
             context.getMatrices().scale(playerListScale, playerListScale, 1);
-            ((InGameHudAccessor) this.client.inGameHud).getPlayerListHud().setVisible(true);
-            ((InGameHudAccessor) this.client.inGameHud).getPlayerListHud().setHeader(Text.literal("  Some Header  "));
-            ((InGameHudAccessor) this.client.inGameHud).getPlayerListHud().setFooter(Text.literal("  Some Footer  "));
-            ((InGameHudAccessor) this.client.inGameHud).getPlayerListHud().render(context, (int) (context.getScaledWindowWidth() / playerListScale), scoreboard, null);
+            this.client.inGameHud.getPlayerListHud().setVisible(true);
+            this.client.inGameHud.getPlayerListHud().setHeader(Text.literal("  Some Header  "));
+            this.client.inGameHud.getPlayerListHud().setFooter(Text.literal("  Some Footer  "));
+            this.client.inGameHud.getPlayerListHud().render(context, (int) (context.getScaledWindowWidth() / playerListScale), scoreboard, null);
             context.getMatrices().pop();
         }
     }
@@ -244,6 +242,16 @@ public class GuiScaleScreen extends Screen {
     @Override
     public void renderInGameBackground(DrawContext context) {
         //super.renderInGameBackground(context);
+    }
+
+    @Override
+    protected void applyBlur(float delta) {
+        //super.applyBlur(delta);
+    }
+
+    @Override
+    protected void renderDarkening(DrawContext context, int x, int y, int width, int height) {
+        //super.renderDarkening(context, x, y, width, height);
     }
 
     public abstract static class NumberFieldWidget extends TextFieldWidget {
