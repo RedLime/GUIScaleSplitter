@@ -12,10 +12,8 @@ import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.scoreboard.*;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
-import net.minecraft.util.Util;
 import net.minecraft.util.math.MathHelper;
 import org.apache.commons.compress.utils.Lists;
-import org.apache.commons.lang3.math.NumberUtils;
 
 import java.util.List;
 import java.util.function.Supplier;
@@ -89,10 +87,10 @@ public class GuiScaleScreen extends Screen {
             }
 
             @Override
-            public void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
-                super.renderWidget(context, mouseX, mouseY, delta);
-                context.drawText(textRenderer, "Player List Scale", GuiScaleScreen.this.width / 2 - 152, this.getY() + 6, 0xFFFFFF, true);
-                context.drawText(textRenderer, "%", this.getX() + this.getWidth() + 2, this.getY() + 6, 0xFFFFFF, true);
+            public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+                super.render(context, mouseX, mouseY, delta);
+                if (this.visible) context.drawText(textRenderer, "Player List Scale", GuiScaleScreen.this.width / 2 - 152, this.getY() + 6, 0xFFFFFF, true);
+                if (this.visible) context.drawText(textRenderer, "%", this.getX() + this.getWidth() + 2, this.getY() + 6, 0xFFFFFF, true);
             }
         }));
 
@@ -117,10 +115,10 @@ public class GuiScaleScreen extends Screen {
             }
 
             @Override
-            public void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
-                super.renderWidget(context, mouseX, mouseY, delta);
-                context.drawText(textRenderer, "Title Text Scale", GuiScaleScreen.this.width / 2 + 2, this.getY() + 6, 0xFFFFFF, true);
-                context.drawText(textRenderer, "%", this.getX() + this.getWidth() + 2, this.getY() + 6, 0xFFFFFF, true);
+            public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+                super.render(context, mouseX, mouseY, delta);
+                if (this.visible) context.drawText(textRenderer, "Title Text Scale", GuiScaleScreen.this.width / 2 + 2, this.getY() + 6, 0xFFFFFF, true);
+                if (this.visible) context.drawText(textRenderer, "%", this.getX() + this.getWidth() + 2, this.getY() + 6, 0xFFFFFF, true);
             }
         }));
 
@@ -145,10 +143,10 @@ public class GuiScaleScreen extends Screen {
             }
 
             @Override
-            public void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
-                super.renderWidget(context, mouseX, mouseY, delta);
-                context.drawText(textRenderer, "Scoreboard Scale", GuiScaleScreen.this.width / 2 - 152, this.getY() + 6, 0xFFFFFF, true);
-                context.drawText(textRenderer, "%", this.getX() + this.getWidth() + 2, this.getY() + 6, 0xFFFFFF, true);
+            public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+                super.render(context, mouseX, mouseY, delta);
+                if (this.visible) context.drawText(textRenderer, "Scoreboard Scale", GuiScaleScreen.this.width / 2 - 152, this.getY() + 6, 0xFFFFFF, true);
+                if (this.visible) context.drawText(textRenderer, "%", this.getX() + this.getWidth() + 2, this.getY() + 6, 0xFFFFFF, true);
             }
         }));
 
@@ -173,9 +171,9 @@ public class GuiScaleScreen extends Screen {
             }
 
             @Override
-            public void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
-                super.renderWidget(context, mouseX, mouseY, delta);
-                context.drawText(textRenderer, "Scoreboard Y Offset", GuiScaleScreen.this.width / 2 + 2, this.getY() + 6, 0xFFFFFF, true);
+            public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+                super.render(context, mouseX, mouseY, delta);
+                if (this.visible) context.drawText(textRenderer, "Scoreboard Y Offset", GuiScaleScreen.this.width / 2 + 2, this.getY() + 6, 0xFFFFFF, true);
             }
         }));
 
@@ -197,6 +195,7 @@ public class GuiScaleScreen extends Screen {
 
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+        if (this.client != null && this.client.world == null) this.renderBackground(context);
         super.render(context, mouseX, mouseY, delta);
 
         if (this.client != null && this.client.world == null) {
@@ -223,10 +222,10 @@ public class GuiScaleScreen extends Screen {
             ((InGameHudAccessor) this.client.inGameHud).setScaledWidth(context.getScaledWindowWidth());
             ((InGameHudAccessor) this.client.inGameHud).setScaledHeight(context.getScaledWindowHeight());
             Scoreboard scoreboard = new Scoreboard();
-            ScoreboardObjective objective = scoreboard.addObjective("test", ScoreboardCriterion.DUMMY, Text.literal("Test Scoreboard"), ScoreboardCriterion.RenderType.INTEGER, false, null);
-            ScoreAccess score = scoreboard.getOrCreateScore(ScoreHolder.fromName("test1"), objective);
+            ScoreboardObjective objective = scoreboard.addObjective("test", ScoreboardCriterion.DUMMY, Text.literal("Test Scoreboard"), ScoreboardCriterion.RenderType.INTEGER);
+            ScoreboardPlayerScore score = scoreboard.getPlayerScore("test1", objective);
             score.setScore(10);
-            scoreboard.setObjectiveSlot(ScoreboardDisplaySlot.SIDEBAR, objective);
+            scoreboard.setObjectiveSlot(Scoreboard.SIDEBAR_DISPLAY_SLOT_ID, objective);
             ((InGameHudAccessor) this.client.inGameHud).invokeRenderScoreboardSidebar(context, objective);
             context.getMatrices().pop();
 
@@ -239,11 +238,6 @@ public class GuiScaleScreen extends Screen {
             ((InGameHudAccessor) this.client.inGameHud).getPlayerListHud().render(context, (int) (context.getScaledWindowWidth() / playerListScale), scoreboard, null);
             context.getMatrices().pop();
         }
-    }
-
-    @Override
-    public void renderInGameBackground(DrawContext context) {
-        //super.renderInGameBackground(context);
     }
 
     public abstract static class NumberFieldWidget extends TextFieldWidget {

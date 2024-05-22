@@ -6,7 +6,6 @@ import com.redlimerl.guiscalesplitter.GuiScaleScreen;
 import com.redlimerl.guiscalesplitter.GuiScaleSplitter;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.client.gui.hud.PlayerListHud;
@@ -52,13 +51,13 @@ public class MixinInGameHud {
         context.getMatrices().pop();
     }
 
-    @WrapOperation(method = "method_55440", at = @At(value = "FIELD", target = "Lnet/minecraft/client/gui/hud/InGameHud;scaledHeight:I"))
+    @WrapOperation(method = "renderScoreboardSidebar", at = @At(value = "FIELD", target = "Lnet/minecraft/client/gui/hud/InGameHud;scaledHeight:I"))
     public int onStartScoreboardRenderHeight(InGameHud instance, Operation<Integer> original) {
         float listScale = GuiScaleSplitter.getOption("scoreboardScale");
         return (int) (original.call(instance) / listScale);
     }
 
-    @WrapOperation(method = "method_55440", at = @At(value = "FIELD", target = "Lnet/minecraft/client/gui/hud/InGameHud;scaledWidth:I"))
+    @WrapOperation(method = "renderScoreboardSidebar", at = @At(value = "FIELD", target = "Lnet/minecraft/client/gui/hud/InGameHud;scaledWidth:I"))
     public int onStartScoreboardRenderWidth(InGameHud instance, Operation<Integer> original) {
         float listScale = GuiScaleSplitter.getOption("scoreboardScale");
         return (int) (original.call(instance) / listScale);
@@ -66,7 +65,7 @@ public class MixinInGameHud {
 
     @Unique
     private DrawContext lastDrawContext = null;
-    @WrapOperation(method = "method_55440", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;fill(IIIII)V", ordinal = 0))
+    @WrapOperation(method = "renderScoreboardSidebar", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;fill(IIIII)V", ordinal = 0))
     public void onScoreboardFill(DrawContext instance, int x1, int y1, int x2, int y2, int color, Operation<Void> original) {
         float listScale = GuiScaleSplitter.getOption("scoreboardScale");
         float listOffset = GuiScaleSplitter.getOption("scoreboardOffset");
@@ -77,7 +76,7 @@ public class MixinInGameHud {
         original.call(instance, x1, y1, x2, y2, color);
     }
 
-    @Inject(method = "method_55440", at = @At("TAIL"))
+    @Inject(method = "renderScoreboardSidebar", at = @At("TAIL"))
     public void onScoreboardTail(CallbackInfo ci) {
         lastDrawContext.getMatrices().pop();
         lastDrawContext = null;

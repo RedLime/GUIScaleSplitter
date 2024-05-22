@@ -27,7 +27,7 @@ public class MixinPlayerListHud {
     public void modifySingleplay(CallbackInfoReturnable<List<PlayerListEntry>> cir) {
         if (this.client.player == null) {
             cir.setReturnValue(Lists.newArrayList(
-                    new PlayerListEntry(this.client.getGameProfile(), false)
+                    new PlayerListEntry(this.client.getSession().getProfile(), false)
             ));
         }
     }
