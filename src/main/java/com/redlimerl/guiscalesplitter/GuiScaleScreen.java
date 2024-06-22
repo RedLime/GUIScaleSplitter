@@ -177,6 +177,13 @@ public class GuiScaleScreen extends Screen {
             }
         }));
 
+        Supplier<Text> scoreboardScore = () -> Text.literal("Scoreboard Score : " + (GuiScaleSplitter.getOption("disableScoreboardScore") != 0 ? "Hide" : "Show"));
+        this.addDrawableChild(ButtonWidget.builder(scoreboardScore.get(), button -> {
+            GuiScaleSplitter.setOption("disableScoreboardScore", GuiScaleSplitter.getOption("disableScoreboardScore") != 0 ? 0 : 1);
+            GuiScaleScreen.this.saveButton.active = true;
+            button.setMessage(scoreboardScore.get());
+        }).dimensions(this.width / 2 - 152, this.height - 104, 150, 20).build());
+
         if (!this.refreshing) this.updateSliderMode();
     }
 

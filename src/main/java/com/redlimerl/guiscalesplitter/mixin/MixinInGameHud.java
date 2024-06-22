@@ -6,6 +6,7 @@ import com.redlimerl.guiscalesplitter.GuiScaleScreen;
 import com.redlimerl.guiscalesplitter.GuiScaleSplitter;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.client.gui.hud.PlayerListHud;
@@ -74,6 +75,12 @@ public class MixinInGameHud {
         instance.getMatrices().scale(listScale, listScale, 1);
         instance.getMatrices().translate(0, listOffset, 0);
         original.call(instance, x1, y1, x2, y2, color);
+    }
+
+    @WrapOperation(method = "renderScoreboardSidebar", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;drawText(Lnet/minecraft/client/font/TextRenderer;Ljava/lang/String;IIIZ)I"))
+    public int onScoreboardScore(DrawContext instance, TextRenderer textRenderer, String text, int x, int y, int color, boolean shadow, Operation<Integer> original) {
+        boolean activate = GuiScaleSplitter.getOption("disableScoreboardScore") != 0;
+        return activate ? instance.drawText(textRenderer, "", x, y, 0, shadow) : original.call(instance, textRenderer, text, x, y, color, shadow);
     }
 
     @Inject(method = "renderScoreboardSidebar", at = @At("TAIL"))
