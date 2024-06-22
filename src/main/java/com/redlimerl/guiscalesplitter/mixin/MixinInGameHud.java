@@ -77,6 +77,12 @@ public class MixinInGameHud {
         original.call(instance, x1, y1, x2, y2, color);
     }
 
+    @WrapOperation(method = "method_55440", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;drawText(Lnet/minecraft/client/font/TextRenderer;Lnet/minecraft/text/Text;IIIZ)I", ordinal = 2))
+    public int onScoreboardScore(DrawContext instance, TextRenderer textRenderer, Text text, int x, int y, int color, boolean shadow, Operation<Integer> original) {
+        boolean activate = GuiScaleSplitter.getOption("disableScoreboardScore") != 0;
+        return activate ? instance.drawText(textRenderer, "", x, y, 0, shadow) : original.call(instance, textRenderer, text, x, y, color, shadow);
+    }
+
     @Inject(method = "method_55440", at = @At("TAIL"))
     public void onScoreboardTail(CallbackInfo ci) {
         lastDrawContext.getMatrices().pop();
