@@ -12,10 +12,8 @@ import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.scoreboard.*;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
-import net.minecraft.util.Util;
 import net.minecraft.util.math.MathHelper;
 import org.apache.commons.compress.utils.Lists;
-import org.apache.commons.lang3.math.NumberUtils;
 
 import java.util.List;
 import java.util.function.Supplier;
@@ -178,6 +176,13 @@ public class GuiScaleScreen extends Screen {
                 context.drawText(textRenderer, "Scoreboard Y Offset", GuiScaleScreen.this.width / 2 + 2, this.getY() + 6, 0xFFFFFF, true);
             }
         }));
+
+        Supplier<Text> scoreboardScore = () -> Text.literal("Scoreboard Score : " + (GuiScaleSplitter.getOption("disableScoreboardScore") != 0 ? "Hide" : "Show"));
+        this.addDrawableChild(ButtonWidget.builder(scoreboardScore.get(), button -> {
+            GuiScaleSplitter.setOption("disableScoreboardScore", GuiScaleSplitter.getOption("disableScoreboardScore") != 0 ? 0 : 1);
+            GuiScaleScreen.this.saveButton.active = true;
+            button.setMessage(scoreboardScore.get());
+        }).dimensions(this.width / 2 - 152, this.height - 104, 150, 20).build());
 
         if (!this.refreshing) this.updateSliderMode();
     }
