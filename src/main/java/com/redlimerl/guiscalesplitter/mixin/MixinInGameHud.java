@@ -85,8 +85,10 @@ public class MixinInGameHud {
 
     @Inject(method = "renderScoreboardSidebar", at = @At("TAIL"))
     public void onScoreboardTail(CallbackInfo ci) {
-        lastDrawContext.getMatrices().pop();
-        lastDrawContext = null;
+        if (lastDrawContext != null) {
+            lastDrawContext.getMatrices().pop();
+            lastDrawContext = null;
+        }
     }
 
     @WrapOperation(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/util/math/MatrixStack;translate(FFF)V", ordinal = 1))
