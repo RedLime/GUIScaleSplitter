@@ -250,8 +250,8 @@ public class GuiScaleScreen extends Screen {
     }
 
     @Override
-    protected void applyBlur(float delta) {
-        //super.applyBlur(delta);
+    protected void applyBlur() {
+//        super.applyBlur();
     }
 
     @Override

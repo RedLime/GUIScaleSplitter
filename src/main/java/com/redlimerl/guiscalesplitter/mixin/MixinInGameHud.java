@@ -52,43 +52,37 @@ public class MixinInGameHud {
         context.getMatrices().pop();
     }
 
-    @WrapOperation(method = "method_55440", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;getScaledWindowHeight()I"))
+    @WrapOperation(method = "renderScoreboardSidebar(Lnet/minecraft/client/gui/DrawContext;Lnet/minecraft/scoreboard/ScoreboardObjective;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;getScaledWindowHeight()I"))
     public int onStartScoreboardRenderHeight(DrawContext instance, Operation<Integer> original) {
         float listScale = GuiScaleSplitter.getOption("scoreboardScale");
         return (int) (original.call(instance) / listScale);
     }
 
-    @WrapOperation(method = "method_55440", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;getScaledWindowWidth()I"))
+    @WrapOperation(method = "renderScoreboardSidebar(Lnet/minecraft/client/gui/DrawContext;Lnet/minecraft/scoreboard/ScoreboardObjective;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;getScaledWindowWidth()I"))
     public int onStartScoreboardRenderWidth(DrawContext instance, Operation<Integer> original) {
         float listScale = GuiScaleSplitter.getOption("scoreboardScale");
         return (int) (original.call(instance) / listScale);
     }
 
-    @Unique
-    private DrawContext lastDrawContext = null;
-    @WrapOperation(method = "method_55440", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;fill(IIIII)V", ordinal = 0))
+    @WrapOperation(method = "renderScoreboardSidebar(Lnet/minecraft/client/gui/DrawContext;Lnet/minecraft/scoreboard/ScoreboardObjective;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;fill(IIIII)V", ordinal = 0))
     public void onScoreboardFill(DrawContext instance, int x1, int y1, int x2, int y2, int color, Operation<Void> original) {
         float listScale = GuiScaleSplitter.getOption("scoreboardScale");
         float listOffset = GuiScaleSplitter.getOption("scoreboardOffset");
-        lastDrawContext = instance;
         instance.getMatrices().push();
         instance.getMatrices().scale(listScale, listScale, 1);
         instance.getMatrices().translate(0, listOffset, 0);
         original.call(instance, x1, y1, x2, y2, color);
     }
 
-    @WrapOperation(method = "method_55440", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;drawText(Lnet/minecraft/client/font/TextRenderer;Lnet/minecraft/text/Text;IIIZ)I", ordinal = 2))
+    @WrapOperation(method = "renderScoreboardSidebar(Lnet/minecraft/client/gui/DrawContext;Lnet/minecraft/scoreboard/ScoreboardObjective;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;drawText(Lnet/minecraft/client/font/TextRenderer;Lnet/minecraft/text/Text;IIIZ)I", ordinal = 2))
     public int onScoreboardScore(DrawContext instance, TextRenderer textRenderer, Text text, int x, int y, int color, boolean shadow, Operation<Integer> original) {
         boolean activate = GuiScaleSplitter.getOption("disableScoreboardScore") != 0;
         return activate ? instance.drawText(textRenderer, "", x, y, 0, shadow) : original.call(instance, textRenderer, text, x, y, color, shadow);
     }
 
-    @Inject(method = "method_55440", at = @At("TAIL"))
-    public void onScoreboardTail(CallbackInfo ci) {
-        if (lastDrawContext != null) {
-            lastDrawContext.getMatrices().pop();
-            lastDrawContext = null;
-        }
+    @Inject(method = "renderScoreboardSidebar(Lnet/minecraft/client/gui/DrawContext;Lnet/minecraft/scoreboard/ScoreboardObjective;)V", at = @At("TAIL"))
+    public void onScoreboardTail(DrawContext drawContext, ScoreboardObjective objective, CallbackInfo ci) {
+        drawContext.getMatrices().pop();
     }
 
     @WrapOperation(method = "renderTitleAndSubtitle", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/util/math/MatrixStack;translate(FFF)V"))
