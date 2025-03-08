@@ -76,7 +76,7 @@ public class MixinInGameHud {
 
     @WrapOperation(method = "renderScoreboardSidebar(Lnet/minecraft/client/gui/DrawContext;Lnet/minecraft/scoreboard/ScoreboardObjective;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;drawText(Lnet/minecraft/client/font/TextRenderer;Lnet/minecraft/text/Text;IIIZ)I", ordinal = 2))
     public int onScoreboardScore(DrawContext instance, TextRenderer textRenderer, Text text, int x, int y, int color, boolean shadow, Operation<Integer> original) {
-        boolean activate = GuiScaleSplitter.getOption("disableScoreboardScore") != 0;
+        boolean activate = GuiScaleSplitter.getOption("disableScoreboardScore", 0) != 0;
         return activate ? instance.drawText(textRenderer, "", x, y, 0, shadow) : original.call(instance, textRenderer, text, x, y, color, shadow);
     }
 
