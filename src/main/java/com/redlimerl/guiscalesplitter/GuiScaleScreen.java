@@ -1,6 +1,5 @@
 package com.redlimerl.guiscalesplitter;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.redlimerl.guiscalesplitter.mixin.InGameHudAccessor;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -12,6 +11,7 @@ import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.scoreboard.*;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
+import net.minecraft.util.Colors;
 import net.minecraft.util.math.MathHelper;
 import org.apache.commons.compress.utils.Lists;
 
@@ -89,8 +89,8 @@ public class GuiScaleScreen extends Screen {
             @Override
             public void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
                 super.renderWidget(context, mouseX, mouseY, delta);
-                context.drawText(textRenderer, "Player List Scale", GuiScaleScreen.this.width / 2 - 152, this.getY() + 6, 0xFFFFFF, true);
-                context.drawText(textRenderer, "%", this.getX() + this.getWidth() + 2, this.getY() + 6, 0xFFFFFF, true);
+                context.drawText(textRenderer, "Player List Scale", GuiScaleScreen.this.width / 2 - 152, this.getY() + 6, Colors.WHITE, true);
+                context.drawText(textRenderer, "%", this.getX() + this.getWidth() + 2, this.getY() + 6, Colors.WHITE, true);
             }
         }));
 
@@ -117,8 +117,8 @@ public class GuiScaleScreen extends Screen {
             @Override
             public void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
                 super.renderWidget(context, mouseX, mouseY, delta);
-                context.drawText(textRenderer, "Title Text Scale", GuiScaleScreen.this.width / 2 + 2, this.getY() + 6, 0xFFFFFF, true);
-                context.drawText(textRenderer, "%", this.getX() + this.getWidth() + 2, this.getY() + 6, 0xFFFFFF, true);
+                context.drawText(textRenderer, "Title Text Scale", GuiScaleScreen.this.width / 2 + 2, this.getY() + 6, Colors.WHITE, true);
+                context.drawText(textRenderer, "%", this.getX() + this.getWidth() + 2, this.getY() + 6, Colors.WHITE, true);
             }
         }));
 
@@ -145,8 +145,8 @@ public class GuiScaleScreen extends Screen {
             @Override
             public void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
                 super.renderWidget(context, mouseX, mouseY, delta);
-                context.drawText(textRenderer, "Scoreboard Scale", GuiScaleScreen.this.width / 2 - 152, this.getY() + 6, 0xFFFFFF, true);
-                context.drawText(textRenderer, "%", this.getX() + this.getWidth() + 2, this.getY() + 6, 0xFFFFFF, true);
+                context.drawText(textRenderer, "Scoreboard Scale", GuiScaleScreen.this.width / 2 - 152, this.getY() + 6, Colors.WHITE, true);
+                context.drawText(textRenderer, "%", this.getX() + this.getWidth() + 2, this.getY() + 6, Colors.WHITE, true);
             }
         }));
 
@@ -173,7 +173,7 @@ public class GuiScaleScreen extends Screen {
             @Override
             public void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
                 super.renderWidget(context, mouseX, mouseY, delta);
-                context.drawText(textRenderer, "Scoreboard Y Offset", GuiScaleScreen.this.width / 2 + 2, this.getY() + 6, 0xFFFFFF, true);
+                context.drawText(textRenderer, "Scoreboard Y Offset", GuiScaleScreen.this.width / 2 + 2, this.getY() + 6, Colors.WHITE, true);
             }
         }));
 
@@ -205,42 +205,40 @@ public class GuiScaleScreen extends Screen {
         super.render(context, mouseX, mouseY, delta);
 
         if (this.client != null && this.client.world == null) {
-            context.getMatrices().push();
+            context.getMatrices().pushMatrix();
             float titleScale = GuiScaleSplitter.getOption("titleScale");
-            context.getMatrices().scale(titleScale, titleScale, 1);
-            context.getMatrices().translate((float) this.width / 2 / titleScale, (float) this.height / 2 / titleScale, 0);
-            RenderSystem.enableBlend();
-            context.getMatrices().push();
-            context.getMatrices().scale(4.0F, 4.0F, 4.0F);
+            context.getMatrices().scale(titleScale, titleScale);
+            context.getMatrices().translate((float) this.width / 2 / titleScale, (float) this.height / 2 / titleScale);
+            context.getMatrices().pushMatrix();
+            context.getMatrices().scale(4.0F, 4.0F);
             int m = textRenderer.getWidth(EXAMPLE_TITLE);
-            context.drawTextWithShadow(textRenderer, EXAMPLE_TITLE, -m / 2, -10, 0xFFFFFF);
-            context.getMatrices().pop();
-            context.getMatrices().push();
-            context.getMatrices().scale(2.0F, 2.0F, 2.0F);
+            context.drawTextWithShadow(textRenderer, EXAMPLE_TITLE, -m / 2, -10, Colors.WHITE);
+            context.getMatrices().popMatrix();
+            context.getMatrices().pushMatrix();
+            context.getMatrices().scale(2.0F, 2.0F);
             int n = textRenderer.getWidth(EXAMPLE_SUBTITLE);
-            context.drawTextWithShadow(textRenderer, EXAMPLE_SUBTITLE, -n / 2, 5, 0xFFFFFF);
-            context.getMatrices().pop();
+            context.drawTextWithShadow(textRenderer, EXAMPLE_SUBTITLE, -n / 2, 5, Colors.WHITE);
+            context.getMatrices().popMatrix();
 
-            RenderSystem.disableBlend();
-            context.getMatrices().pop();
+            context.getMatrices().popMatrix();
 
-            context.getMatrices().push();
+            context.getMatrices().pushMatrix();
             Scoreboard scoreboard = new Scoreboard();
             ScoreboardObjective objective = scoreboard.addObjective("test", ScoreboardCriterion.DUMMY, Text.literal("Test Scoreboard"), ScoreboardCriterion.RenderType.INTEGER, false, null);
             ScoreAccess score = scoreboard.getOrCreateScore(ScoreHolder.fromName("test1"), objective);
             score.setScore(10);
             scoreboard.setObjectiveSlot(ScoreboardDisplaySlot.SIDEBAR, objective);
             ((InGameHudAccessor) this.client.inGameHud).invokeRenderScoreboardSidebar(context, objective);
-            context.getMatrices().pop();
+            context.getMatrices().popMatrix();
 
-            context.getMatrices().push();
+            context.getMatrices().pushMatrix();
             float playerListScale = GuiScaleSplitter.getOption("playerListScale");
-            context.getMatrices().scale(playerListScale, playerListScale, 1);
+            context.getMatrices().scale(playerListScale, playerListScale);
             this.client.inGameHud.getPlayerListHud().setVisible(true);
             this.client.inGameHud.getPlayerListHud().setHeader(Text.literal("  Some Header  "));
             this.client.inGameHud.getPlayerListHud().setFooter(Text.literal("  Some Footer  "));
             this.client.inGameHud.getPlayerListHud().render(context, (int) (context.getScaledWindowWidth() / playerListScale), scoreboard, null);
-            context.getMatrices().pop();
+            context.getMatrices().popMatrix();
         }
     }
 
@@ -250,8 +248,8 @@ public class GuiScaleScreen extends Screen {
     }
 
     @Override
-    protected void applyBlur() {
-//        super.applyBlur();
+    protected void applyBlur(DrawContext context) {
+//        super.applyBlur(context);
     }
 
     @Override

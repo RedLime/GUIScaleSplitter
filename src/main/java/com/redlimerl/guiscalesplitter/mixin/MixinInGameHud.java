@@ -11,10 +11,11 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.client.gui.hud.PlayerListHud;
 import net.minecraft.client.option.KeyBinding;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.scoreboard.Scoreboard;
 import net.minecraft.scoreboard.ScoreboardObjective;
 import net.minecraft.text.Text;
+import org.joml.Matrix3x2f;
+import org.joml.Matrix3x2fStack;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -46,10 +47,10 @@ public class MixinInGameHud {
     @WrapOperation(method = "renderPlayerList", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/PlayerListHud;render(Lnet/minecraft/client/gui/DrawContext;ILnet/minecraft/scoreboard/Scoreboard;Lnet/minecraft/scoreboard/ScoreboardObjective;)V"))
     public void onPlayerListRender(PlayerListHud instance, DrawContext context, int scaledWindowWidth, Scoreboard scoreboard, ScoreboardObjective objective, Operation<Void> original) {
         float listScale = GuiScaleSplitter.getOption("playerListScale");
-        context.getMatrices().push();
-        context.getMatrices().scale(listScale, listScale, 1);
+        context.getMatrices().pushMatrix();
+        context.getMatrices().scale(listScale, listScale);
         original.call(instance, context, (int) (scaledWindowWidth / listScale), scoreboard, objective);
-        context.getMatrices().pop();
+        context.getMatrices().popMatrix();
     }
 
     @WrapOperation(method = "renderScoreboardSidebar(Lnet/minecraft/client/gui/DrawContext;Lnet/minecraft/scoreboard/ScoreboardObjective;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;getScaledWindowHeight()I"))
@@ -68,28 +69,30 @@ public class MixinInGameHud {
     public void onScoreboardFill(DrawContext instance, int x1, int y1, int x2, int y2, int color, Operation<Void> original) {
         float listScale = GuiScaleSplitter.getOption("scoreboardScale");
         float listOffset = GuiScaleSplitter.getOption("scoreboardOffset");
-        instance.getMatrices().push();
-        instance.getMatrices().scale(listScale, listScale, 1);
-        instance.getMatrices().translate(0, listOffset, 0);
+        instance.getMatrices().pushMatrix();
+        instance.getMatrices().scale(listScale, listScale);
+        instance.getMatrices().translate(0, listOffset);
         original.call(instance, x1, y1, x2, y2, color);
     }
 
-    @WrapOperation(method = "renderScoreboardSidebar(Lnet/minecraft/client/gui/DrawContext;Lnet/minecraft/scoreboard/ScoreboardObjective;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;drawText(Lnet/minecraft/client/font/TextRenderer;Lnet/minecraft/text/Text;IIIZ)I", ordinal = 2))
-    public int onScoreboardScore(DrawContext instance, TextRenderer textRenderer, Text text, int x, int y, int color, boolean shadow, Operation<Integer> original) {
+    @WrapOperation(method = "renderScoreboardSidebar(Lnet/minecraft/client/gui/DrawContext;Lnet/minecraft/scoreboard/ScoreboardObjective;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;drawText(Lnet/minecraft/client/font/TextRenderer;Lnet/minecraft/text/Text;IIIZ)V", ordinal = 2))
+    public void onScoreboardScore(DrawContext instance, TextRenderer textRenderer, Text text, int x, int y, int color, boolean shadow, Operation<Integer> original) {
         boolean activate = GuiScaleSplitter.getOption("disableScoreboardScore") != 0;
-        return activate ? instance.drawText(textRenderer, "", x, y, 0, shadow) : original.call(instance, textRenderer, text, x, y, color, shadow);
+        if (!activate) {
+            original.call(instance, textRenderer, text, x, y, color, shadow);
+        }
     }
 
     @Inject(method = "renderScoreboardSidebar(Lnet/minecraft/client/gui/DrawContext;Lnet/minecraft/scoreboard/ScoreboardObjective;)V", at = @At("TAIL"))
     public void onScoreboardTail(DrawContext drawContext, ScoreboardObjective objective, CallbackInfo ci) {
-        drawContext.getMatrices().pop();
+        drawContext.getMatrices().popMatrix();
     }
 
-    @WrapOperation(method = "renderTitleAndSubtitle", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/util/math/MatrixStack;translate(FFF)V"))
-    public void onTranslateRender(MatrixStack instance, float x, float y, float z, Operation<Void> original) {
+    @WrapOperation(method = "renderTitleAndSubtitle", at = @At(value = "INVOKE", target = "Lorg/joml/Matrix3x2fStack;translate(FF)Lorg/joml/Matrix3x2f;", remap = false))
+    public Matrix3x2f onTranslateRender(Matrix3x2fStack instance, float x, float y, Operation<Matrix3x2f> original) {
         float listScale = GuiScaleSplitter.getOption("titleScale");
-        instance.scale(listScale, listScale, 1);
-        instance.translate(x / listScale, y / listScale, z);
+        instance.scale(listScale, listScale);
+        return instance.translate(x / listScale, y / listScale);
     }
 
     @WrapOperation(method = "renderTitleAndSubtitle", at = @At(value = "FIELD", target = "Lnet/minecraft/client/gui/hud/InGameHud;title:Lnet/minecraft/text/Text;"))
