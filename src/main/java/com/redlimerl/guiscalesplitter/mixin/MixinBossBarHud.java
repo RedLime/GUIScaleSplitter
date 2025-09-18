@@ -14,16 +14,17 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class MixinBossBarHud {
 
     @WrapOperation(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;getScaledWindowWidth()I"))
-    public int onBossBarWidth(DrawContext context, Operation<Integer> original) {
-        float listScale = GuiScaleSplitter.getOption("playerListScale");
-        return (int) (original.call(context) / listScale);
+    public int onBossBarWidth(DrawContext instance, Operation<Integer> original) {
+        float barScale = GuiScaleSplitter.getOption("playerListScale");
+        return (int) (original.call(instance) / barScale);
     }
 
-    @Inject(method = "render", at = @At("HEAD"))
-    public void onBossBarHead(DrawContext context, CallbackInfo ci) {
-        float listScale = GuiScaleSplitter.getOption("playerListScale");
-        context.getMatrices().pushMatrix();
-        context.getMatrices().scale(listScale, listScale);
+    @WrapOperation(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;createNewRootLayer()V"))
+    public void onBossBarCreate(DrawContext instance, Operation<Void> original) {
+        float barScale = GuiScaleSplitter.getOption("playerListScale");
+        instance.getMatrices().pushMatrix();
+        instance.getMatrices().scale(barScale, barScale);
+        original.call(instance);
     }
 
     @Inject(method = "render", at = @At("TAIL"))
