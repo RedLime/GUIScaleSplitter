@@ -184,6 +184,34 @@ public class GuiScaleScreen extends Screen {
             button.setMessage(scoreboardScore.get());
         }).dimensions(this.width / 2 - 152, this.height - 104, 150, 20).build());
 
+        Supplier<Text> bossBarScale = () -> Text.literal("Boss Bar Scale : " + MathHelper.ceil(GuiScaleSplitter.getOption("bossBarScale") * 100) + "%");
+        this.sliders.add(this.addDrawableChild(new SliderWidget(this.width / 2 + 2, this.height - 104, 150, 20, bossBarScale.get(), GuiScaleSplitter.getOption("bossBarScale") / 2f) {
+            @Override
+            protected void updateMessage() {
+                this.setMessage(bossBarScale.get());
+            }
+
+            @Override
+            protected void applyValue() {
+                GuiScaleSplitter.setOption("bossBarScale", Math.round((float) this.value * 2f * 20f)/20f);
+                GuiScaleScreen.this.saveButton.active = true;
+            }
+        }));
+        this.fields.add(this.addDrawableChild(new NumberFieldWidget(this.textRenderer, this.width / 2 + 122 - percentWidth, this.height - 104, 36 - percentWidth, 20, MathHelper.ceil(GuiScaleSplitter.getOption("bossBarScale") * 100)) {
+            @Override
+            public void onUpdateValue(int value) {
+                GuiScaleSplitter.setOption("bossBarScale", value / 100f);
+                GuiScaleScreen.this.saveButton.active = true;
+            }
+
+            @Override
+            public void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
+                super.renderWidget(context, mouseX, mouseY, delta);
+                context.drawText(textRenderer, "Boss Bar Scale", GuiScaleScreen.this.width / 2 + 2, this.getY() + 6, Colors.WHITE, true);
+                context.drawText(textRenderer, "%", this.getX() + this.getWidth() + 2, this.getY() + 6, Colors.WHITE, true);
+            }
+        }));
+
         if (!this.refreshing) this.updateSliderMode();
     }
 

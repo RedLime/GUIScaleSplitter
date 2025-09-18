@@ -15,13 +15,13 @@ public class MixinBossBarHud {
 
     @WrapOperation(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;getScaledWindowWidth()I"))
     public int onBossBarWidth(DrawContext instance, Operation<Integer> original) {
-        float barScale = GuiScaleSplitter.getOption("playerListScale");
+        float barScale = GuiScaleSplitter.getOption("bossBarScale");
         return (int) (original.call(instance) / barScale);
     }
 
     @WrapOperation(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;createNewRootLayer()V"))
     public void onBossBarCreate(DrawContext instance, Operation<Void> original) {
-        float barScale = GuiScaleSplitter.getOption("playerListScale");
+        float barScale = GuiScaleSplitter.getOption("bossBarScale");
         instance.getMatrices().pushMatrix();
         instance.getMatrices().scale(barScale, barScale);
         original.call(instance);
