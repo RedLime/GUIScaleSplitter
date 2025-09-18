@@ -1,5 +1,6 @@
 package com.redlimerl.guiscalesplitter;
 
+import com.redlimerl.guiscalesplitter.mixin.BossBarHudAccessor;
 import com.redlimerl.guiscalesplitter.mixin.InGameHudAccessor;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -8,6 +9,8 @@ import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.gui.widget.SliderWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.client.gui.hud.ClientBossBar;
+import net.minecraft.entity.boss.BossBar;
 import net.minecraft.scoreboard.*;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
@@ -16,6 +19,7 @@ import net.minecraft.util.math.MathHelper;
 import org.apache.commons.compress.utils.Lists;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.function.Supplier;
 
 public class GuiScaleScreen extends Screen {
@@ -247,7 +251,6 @@ public class GuiScaleScreen extends Screen {
             int n = textRenderer.getWidth(EXAMPLE_SUBTITLE);
             context.drawTextWithShadow(textRenderer, EXAMPLE_SUBTITLE, -n / 2, 5, Colors.WHITE);
             context.getMatrices().popMatrix();
-
             context.getMatrices().popMatrix();
 
             context.getMatrices().pushMatrix();
@@ -267,6 +270,12 @@ public class GuiScaleScreen extends Screen {
             this.client.inGameHud.getPlayerListHud().setFooter(Text.literal("  Some Footer  "));
             this.client.inGameHud.getPlayerListHud().render(context, (int) (context.getScaledWindowWidth() / playerListScale), scoreboard, null);
             context.getMatrices().popMatrix();
+
+            ClientBossBar bossBar = new ClientBossBar(UUID.randomUUID(), Text.literal("Test Boss Bar"), 1, BossBar.Color.RED, BossBar.Style.PROGRESS, false, false, false);
+            ((BossBarHudAccessor) this.client.inGameHud.getBossBarHud()).getBossBars().put(bossBar.getUuid(), bossBar);
+            this.client.inGameHud.getBossBarHud().render(context);
+            ((BossBarHudAccessor) this.client.inGameHud.getBossBarHud()).getBossBars().clear();
+
         }
     }
 
@@ -277,7 +286,7 @@ public class GuiScaleScreen extends Screen {
 
     @Override
     protected void applyBlur(DrawContext context) {
-//        super.applyBlur(context);
+        //super.applyBlur(context);
     }
 
     @Override
