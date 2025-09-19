@@ -1,5 +1,6 @@
 package com.redlimerl.guiscalesplitter.mixin;
 
+import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.redlimerl.guiscalesplitter.GuiScaleSplitter;
@@ -12,6 +13,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(BossBarHud.class)
 public class MixinBossBarHud {
+
+    /*
 
     @WrapOperation(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;getScaledWindowWidth()I"))
     public int onBossBarWidth(DrawContext instance, Operation<Integer> original) {
@@ -31,5 +34,7 @@ public class MixinBossBarHud {
     public void onBossBarTail(DrawContext context, CallbackInfo ci) {
         context.getMatrices().popMatrix();
     }
+
+     */
 
 }

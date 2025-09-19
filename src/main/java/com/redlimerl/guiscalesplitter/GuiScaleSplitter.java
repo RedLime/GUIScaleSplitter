@@ -19,6 +19,8 @@ public class GuiScaleSplitter implements ClientModInitializer, ModMenuApi {
     public static final Path CONFIG_FILE = FabricLoader.getInstance().getConfigDir().resolve("guiscalesplitter.json");
     public static JsonObject CONFIG_OBJECT = new JsonObject();
 
+    public static String CURRENT_RENDERING = new String();
+
     @Override
     public void onInitializeClient() {
         loadOptions();

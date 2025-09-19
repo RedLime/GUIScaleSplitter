@@ -232,6 +232,8 @@ public class GuiScaleScreen extends Screen {
         }
     }
 
+    /*
+
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         super.render(context, mouseX, mouseY, delta);
@@ -278,6 +280,8 @@ public class GuiScaleScreen extends Screen {
 
         }
     }
+
+    */
 
     @Override
     public void renderInGameBackground(DrawContext context) {

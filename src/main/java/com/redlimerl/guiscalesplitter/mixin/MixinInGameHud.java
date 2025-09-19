@@ -1,5 +1,6 @@
 package com.redlimerl.guiscalesplitter.mixin;
 
+import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.redlimerl.guiscalesplitter.GuiScaleScreen;
@@ -11,6 +12,7 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.client.gui.hud.PlayerListHud;
 import net.minecraft.client.option.KeyBinding;
+import net.minecraft.client.render.RenderTickCounter;
 import net.minecraft.scoreboard.Scoreboard;
 import net.minecraft.scoreboard.ScoreboardObjective;
 import net.minecraft.text.Text;
@@ -25,14 +27,19 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(InGameHud.class)
-public class MixinInGameHud {
+public abstract class MixinInGameHud {
 
     @Shadow @Final private MinecraftClient client;
+
+    @Shadow
+    public abstract void tick(boolean paused);
 
     @Unique
     private boolean isConfigScreen() {
         return this.client.currentScreen instanceof GuiScaleScreen;
     }
+
+    /*
 
     @WrapOperation(method = "renderPlayerList", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/option/KeyBinding;isPressed()Z"))
     public boolean keyPressed(KeyBinding instance, Operation<Boolean> original) {
@@ -114,4 +121,49 @@ public class MixinInGameHud {
     public Text onSubtitleModify(InGameHud instance, Operation<Text> original) {
         return this.isConfigScreen() ? GuiScaleScreen.EXAMPLE_SUBTITLE : original.call(instance);
     }
+
+     */
+
+    @WrapMethod(method = "renderBossBarHud")
+    public void scaleBossBarHud(DrawContext context, RenderTickCounter tickCounter, Operation<Void> original) {
+        GuiScaleSplitter.CURRENT_RENDERING = "bossBarScale";
+        context.getMatrices().pushMatrix();
+        context.getMatrices().scale(GuiScaleSplitter.getOption(GuiScaleSplitter.CURRENT_RENDERING));
+        original.call(context, tickCounter);
+        context.getMatrices().popMatrix();
+        GuiScaleSplitter.CURRENT_RENDERING = "";
+    }
+
+    @WrapMethod(method = "renderScoreboardSidebar(Lnet/minecraft/client/gui/DrawContext;Lnet/minecraft/client/render/RenderTickCounter;)V")
+    public void scaleScoreboardSidebar(DrawContext context, RenderTickCounter tickCounter, Operation<Void> original) {
+        GuiScaleSplitter.CURRENT_RENDERING = "scoreboardScale";
+        context.getMatrices().pushMatrix();
+        context.getMatrices().scale(GuiScaleSplitter.getOption(GuiScaleSplitter.CURRENT_RENDERING));
+        original.call(context, tickCounter);
+        context.getMatrices().popMatrix();
+        GuiScaleSplitter.CURRENT_RENDERING = "";
+    }
+
+    @WrapMethod(method = "renderTitleAndSubtitle")
+    public void scaleTitleAndSubtitle(DrawContext context, RenderTickCounter tickCounter, Operation<Void> original) {
+        GuiScaleSplitter.CURRENT_RENDERING = "titleScale";
+        float scale = GuiScaleSplitter.getOption(GuiScaleSplitter.CURRENT_RENDERING);
+        context.getMatrices().pushMatrix();
+        context.getMatrices().scale(scale);
+        original.call(context, tickCounter);
+        context.getMatrices().popMatrix();
+        GuiScaleSplitter.CURRENT_RENDERING = "";
+    }
+
+    @WrapMethod(method = "renderPlayerList")
+    public void scalePlayerList(DrawContext context, RenderTickCounter tickCounter, Operation<Void> original) {
+        GuiScaleSplitter.CURRENT_RENDERING = "playerListScale";
+        float scale = GuiScaleSplitter.getOption(GuiScaleSplitter.CURRENT_RENDERING);
+        context.getMatrices().pushMatrix();
+        context.getMatrices().scale(scale);
+        original.call(context, tickCounter);
+        context.getMatrices().popMatrix();
+        GuiScaleSplitter.CURRENT_RENDERING = "";
+    }
+
 }
